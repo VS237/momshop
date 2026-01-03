@@ -1,0 +1,85 @@
+{% extends "admin/dashboard_base.html" %}
+{% load humanize %}
+
+{% block title %}Sales Reports History{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-block justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fas fa-history me-2 text-success"></i>Sales Archives</h3>
+        <a href="{% url 'dashboard_home' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+        
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Date</th>
+                            <th>Total Revenue</th>
+                            <th>Cash / MoMo</th>
+                            <th class="text-center">Transactions</th>
+                            <th class="text-center">Items Sold</th>
+                            <th class="pe-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold">{{ report.report_date|date:"D, M d, Y" }}</div>
+                                <small class="text-muted">ID: #REP-{{ report.id }}</small>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark">{{ report.total_sales|intcomma }} XAF</span>
+                                {% if report.total_sales > 100000 %}
+                                    <span class="badge bg-success-subtle text-success ms-1">High Vol</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="small text-muted">Cash: {{ report.cash_sales|intcomma }}</div>
+                                <div class="small text-muted">MoMo: {{ report.mobile_money_sales|intcomma }}</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="badge bg-light text-dark border">{{ report.total_customers }}</div>
+                            </td>
+                            <td class="text-center">{{ report.total_products_sold }}</td>
+                            <td class="pe-4 text-end">
+                                <div class="btn-group">
+                                    <a href="{% url 'print_sales_report' report.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-secondary" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-folder-open fa-3x text-light mb-3"></i>
+                                <p class="text-muted">No reports found.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mt-3">
+        <form action="{% url 'delete_all_reports' %}" method="POST" onsubmit="return confirm('ARE YOU SURE? This will permanently delete ALL your reports records and cannot be undone.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">
+            <i class="fas fa-trash-alt me-2"></i>Clear All Reports
+        </button>
+        </form>
+        </div>
+</div>
+{% endblock %}

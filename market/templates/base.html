@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template">
+
+	<!-- title -->
+	<title>{% block title%}Mom'shop{%endblock%}</title>
+
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/png" href="{% static 'assets/img/favicon.png' %} ">
+	<!-- google font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+	<!-- fontawesome -->
+	<link rel="stylesheet" href="{% static 'assets/css/all.min.css'%} ">
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css'%} ">
+	<!-- owl carousel -->
+	<link rel="stylesheet" href="{% static 'assets/css/owl.carousel.css'%} ">
+	<!-- magnific popup -->
+	<link rel="stylesheet" href="{% static 'assets/css/magnific-popup.css'%} ">
+	<!-- animate css -->
+	<link rel="stylesheet" href="{% static 'assets/css/animate.css'%} ">
+	<!-- mean menu css -->
+	<link rel="stylesheet" href="{% static 'assets/css/meanmenu.min.css'%} ">
+	<!-- main style -->
+	<link rel="stylesheet" href="{% static 'assets/css/main.css'%} ">
+	<!-- responsive -->
+	<link rel="stylesheet" href="{% static 'assets/css/responsive.css'%} ">
+
+	{% block extra_css %}{% endblock %}
+</head>
+<body>
+	
+	<!-- Header -->
+  {% include 'includes/header.html' %}
+
+	<!-- Navbar -->
+  {% include 'includes/navbar.html' %}
+
+	<!-- Chatbot -->
+  {% include 'includes/chat_bot.html' %}
+
+	{% block content%}
+	{% endblock %}
+	
+	<!-- Footer -->
+  {% include 'includes/footer.html' %}
+	
+	<!-- jquery -->
+	<script src="{% static 'assets/js/jquery-1.11.3.min.js'%} "></script>
+	<!-- bootstrap -->
+	<script src="{% static 'assets/bootstrap/js/bootstrap.min.js'%} "></script>
+	<!-- count down -->
+	<script src="{% static 'assets/js/jquery.countdown.js'%} "></script>
+	<!-- isotope -->
+	<script src="{% static 'assets/js/jquery.isotope-3.0.6.min.js'%} "></script>
+	<!-- waypoints -->
+	<script src="{% static 'assets/js/waypoints.js'%} "></script>
+	<!-- owl carousel -->
+	<script src="{%static 'assets/js/owl.carousel.min.js'%} "></script>
+	<!-- magnific popup -->
+	<script src="{% static 'assets/js/jquery.magnific-popup.min.js'%} "></script>
+	<!-- mean menu -->
+	<script src="{% static 'assets/js/jquery.meanmenu.min.js'%} "></script>
+	<!-- sticker js -->
+	<script src="{% static 'assets/js/sticker.js'%} "></script>
+	<!-- main js -->
+	<script src="{% static 'assets/js/main.js'%} "></script>
+
+	<!--Script for idicating the amount of items added to the cart-->
+	<script>
+    const CSRF_TOKEN = '{{ csrf_token }}';
+	</script>
+	<script>
+		function refreshCartBadge() {
+				fetch("{% url 'get_cart_count' %}")
+						.then(response => response.json())
+						.then(data => {
+								const badge = document.getElementById('nav-cart-count');
+								if (data.total_quantity > 0) {
+										badge.textContent = data.total_quantity;
+										badge.style.display = 'block';
+								} else {
+										badge.style.display = 'none';
+								}
+						})
+						.catch(error => console.error('Error:', error));
+		}
+
+		// 1. Check count immediately when page loads
+		document.addEventListener('DOMContentLoaded', refreshCartBadge);
+
+		document.addEventListener('click', function(e) {
+		const anchor = e.target.closest('.add-to-cart-ajax');
+		
+				if (anchor) {
+						e.preventDefault();
+						const url = anchor.getAttribute('href');
+
+						fetch(url, {
+								method: 'POST',
+								headers: {
+										'X-Requested-With': 'XMLHttpRequest',
+										'X-CSRFToken': CSRF_TOKEN  // This must match the variable in Step 1
+								}
+						})
+						.then(response => {
+								if (!response.ok) throw new Error('Network response was not ok');
+								return response.json();
+						})
+						.then(data => {
+								console.log('Response data:', data); // Debugging
+								
+								if (data.status === 'success') {
+										// IMPORTANT: This ID must match your span exactly
+										const cartBadge = document.getElementById('nav-cart-count');
+										
+										if (cartBadge) {
+												cartBadge.innerText = data.total_items;
+												
+												// Visual feedback
+												anchor.classList.add('btn-success');
+												anchor.classList.remove('btn-orange');
+												anchor.innerHTML = '<i class="fas fa-check"></i>';
+												
+												setTimeout(() => {
+														anchor.classList.add('btn-orange');
+														anchor.classList.remove('btn-success');
+														anchor.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+												}, 1500);
+										} else {
+												console.error('Element #nav-cart-count not found!');
+										}
+								}
+						})
+						.catch(error => console.error('Fetch Error:', error));
+				}
+		});
+	</script>
+
+	{% block extra_js %}{% endblock %}
+
+</body>
+</html>

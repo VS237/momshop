@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Supermarket Manager</title>
+    <link rel="stylesheet" href="{% static 'assets/css/form.css' %}">
+    <style>
+      .form-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+      }
+      .section-title {
+        font-size: 18px;
+        color: #211d16;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+      }
+      .checkbox-group input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+        cursor: pointer;
+      }
+      .checkbox-group label {
+        margin: 0;
+        
+      }
+      .form-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+        font-style: italic;
+      }
+      .error-message {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        background: white;
+      }
+      select:focus {
+        border-color: #2691d9;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!--PreLoader-->
+    <div class="loader">
+        <div class="loader-inner">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <!--PreLoader Ends-->
+    
+    <div class="center">
+      <h1>Create Customer Account</h1>
+
+      {% if messages %}
+      <div class="message-container">
+          {% for message in messages %}
+              {% if message.tags == 'error' %}
+                  <h4 style="color: firebrick;">{{message}}</h4>
+              {% else %}
+                  <h4 style="color: dodgerblue;">{{message}}</h4>
+              {% endif %}
+          {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if form.errors %}
+      <div class="message-container">
+          {% for field in form %}
+              {% for error in field.errors %}
+                  <h4 style="color: firebrick;">{{ error }}</h4>
+              {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+              <h4 style="color: firebrick;">{{ error }}</h4>
+          {% endfor %}
+      </div>
+      {% endif %}
+        
+      <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <!-- Account Information Section -->
+          <div class="form-section">
+            <div class="section-title">Account Information</div>
+            
+            <div class="name-row">
+              <div class="txt_field name-field">
+                <input type="text" required name="username" value="{{ form.username.value|default:'' }}" placeholder=" ">
+                <span></span>
+                <label>Username</label>
+                {% if form.username.help_text %}
+                <div class="form-text">{{ form.username.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <div class="txt_field name-field">
+                <input type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder=" " required>
+                <span></span>
+                <label>Email</label>
+              </div>
+            </div>
+
+            <div class="name-row">
+              <div class="txt_field name-field">
+                <input type="password" required name="password" id="password" placeholder=" ">
+                <span></span>
+                <label>Password</label>
+                {% if form.password.help_text %}
+                <div class="form-text">{{ form.password.help_text }}</div>
+                {% endif %}
+                <div class="password-strength">
+                  <div class="strength-bar" id="password-strength-bar"></div>
+                </div>
+              </div>
+
+              <div class="txt_field name-field">
+                <input type="password" required name="confirm_password" placeholder=" ">
+                <span></span>
+                <label>Confirm Password</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <div class="section-title">Personal Information</div>
+            
+            <div class="name-row">
+              <div class="txt_field name-field">
+                <input type="text" required name="first_name" value="{{ form.first_name.value|default:'' }}" placeholder=" ">
+                <span></span>
+                <label>First Name</label>
+              </div>
+
+              <div class="txt_field name-field">
+                <input type="text" required name="last_name" value="{{ form.last_name.value|default:'' }}" placeholder=" ">
+                <span></span>
+                <label>Last Name</label>
+              </div>
+            </div>
+
+            <div class="txt_field">
+              <input type="tel" required name="phone" value="{{ form.phone.value|default:'' }}" placeholder=" ">
+              <span></span>
+              <label>Phone Number</label>
+              {% if form.phone.help_text %}
+              <div class="form-text">{{ form.phone.help_text }}</div>
+              {% endif %}
+            </div>
+
+            <div class="txt_field">
+              <textarea name="address" rows="3" placeholder=" " style="resize: vertical; min-height: 60px;">{{ form.address.value|default:'' }}</textarea>
+              <span></span>
+              <label>Address</label>
+            </div>
+
+            <div class="name-row">
+              <div class="txt_field name-field">
+                <select name="city" required>
+                  <option value="">Select City</option>
+                  <option value="Douala" {% if form.city.value == 'Douala' %}selected{% endif %}>Douala</option>
+                  <option value="Yaoundé" {% if form.city.value == 'Yaoundé' %}selected{% endif %}>Yaoundé</option>
+                  <option value="Bamenda" {% if form.city.value == 'Bamenda' %}selected{% endif %}>Bamenda</option>
+                  <option value="Bafoussam" {% if form.city.value == 'Bafoussam' %}selected{% endif %}>Bafoussam</option>
+                  <option value="Garoua" {% if form.city.value == 'Garoua' %}selected{% endif %}>Garoua</option>
+                  <option value="Maroua" {% if form.city.value == 'Maroua' %}selected{% endif %}>Maroua</option>
+                  <option value="Ngaoundéré" {% if form.city.value == 'Ngaoundéré' %}selected{% endif %}>Ngaoundéré</option>
+                  <option value="Kumba" {% if form.city.value == 'Kumba' %}selected{% endif %}>Kumba</option>
+                  <option value="Limbe" {% if form.city.value == 'Limbe' %}selected{% endif %}>Limbe</option>
+                  <option value="Buea" {% if form.city.value == 'Buea' %}selected{% endif %}>Buea</option>
+                  <option value="Ebolowa" {% if form.city.value == 'Ebolowa' %}selected{% endif %}>Ebolowa</option>
+                  <option value="Bertoua" {% if form.city.value == 'Bertoua' %}selected{% endif %}>Bertoua</option>
+                </select>
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Preferences Section -->
+          <div class="form-section">
+            <div class="section-title">Customer Preferences</div>
+            
+            <div class="txt_field">
+              <select name="customer_type" required>
+                <option value="occasional" {% if form.customer_type.value == 'occasional' %}selected{% endif %}>Occasional Customer</option>
+                <option value="regular" {% if form.customer_type.value == 'regular' %}selected{% endif %}>Regular Customer</option>
+                <option value="wholesale" {% if form.customer_type.value == 'wholesale' %}selected{% endif %}>Wholesale Customer</option>
+              </select>
+              <span></span>
+            </div>
+        </div>
+
+        <input type="submit" value="Create Account">
+        <div class="signup_link">
+          Already have an account? <a href="{% url 'login' %}">Sign In</a>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Simple password strength indicator
+      document.getElementById('password').addEventListener('input', function(e) {
+        const password = e.target.value;
+        const strengthBar = document.getElementById('password-strength-bar');
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 1;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/\d/)) strength += 1;
+        if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+        
+        strengthBar.className = 'strength-bar';
+        if (password.length > 0) {
+          if (strength <= 1) strengthBar.classList.add('strength-weak');
+          else if (strength <= 2) strengthBar.classList.add('strength-medium');
+          else strengthBar.classList.add('strength-strong');
+        }
+      });
+
+      // Ensure labels stay up when input has content (for browser autofill)
+      document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.txt_field input, .txt_field textarea, .txt_field select');
+        inputs.forEach(input => {
+          if (input.value || (input.tagName === 'SELECT' && input.selectedIndex > 0)) {
+            input.classList.add('has-value');
+          }
+          
+          input.addEventListener('input', function() {
+            if (this.value || (this.tagName === 'SELECT' && this.selectedIndex > 0)) {
+              this.classList.add('has-value');
+            } else {
+              this.classList.remove('has-value');
+            }
+          });
+
+          input.addEventListener('change', function() {
+            if (this.value || (this.tagName === 'SELECT' && this.selectedIndex > 0)) {
+              this.classList.add('has-value');
+            } else {
+              this.classList.remove('has-value');
+            }
+          });
+        });
+
+        // Phone number formatting for Cameroon numbers
+        const phoneInput = document.querySelector('input[name="phone"]');
+        phoneInput.addEventListener('input', function(e) {
+          let value = e.target.value.replace(/\D/g, '');
+          
+          if (value.startsWith('237')) {
+            value = value.substring(3);
+          }
+          
+          if (value.length > 0) {
+            if (value.length <= 2) {
+              e.target.value = '+237' + value;
+            } else if (value.length <= 5) {
+              e.target.value = '+237' + value.substring(0, 2) + value.substring(2);
+            } else if (value.length <= 8) {
+              e.target.value = '+237' + value.substring(0, 2) + value.substring(2, 5) + value.substring(5);
+            } else {
+              e.target.value = '+237' + value.substring(0, 2) + value.substring(2, 5) + value.substring(5, 8) + value.substring(8);
+            }
+          }
+        });
+      });
+
+      // Form validation before submission
+      document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+        
+        if (password !== confirmPassword) {
+          e.preventDefault();
+          alert('Passwords do not match!');
+          return false;
+        }
+
+        const phone = document.querySelector('input[name="phone"]').value;
+        const phoneRegex = /^(\+237|237)?[6-9]\d{8}$/;
+        const cleanPhone = phone.replace(/\s/g, '');
+        
+        if (!phoneRegex.test(cleanPhone)) {
+          e.preventDefault();
+          alert('Please enter a valid Cameroonian phone number (e.g., +2376XX XXX XXX or 6XX XXX XXX)');
+          return false;
+        }
+      });
+    </script>
+  </body>
+</html>

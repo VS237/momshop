@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'assets/css/form.css' %}">
+  </head>
+  <body>
+    <div class="center">
+      <h1>Login</h1>
+
+      {% if messages %}
+      <div class="message-container">
+          {% for message in messages %}
+              {% if message.tags == 'error' %}
+                  <h4 style="color: firebrick;">{{message}}</h4>
+              {% else %}
+                  <h4 style="color: dodgerblue;">{{message}}</h4>
+              {% endif %}
+          {% endfor %}
+      </div>
+      {% endif %}
+        
+      <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">         
+          <div class="txt_field">
+            <input type="text" required name="user" placeholder=" ">
+            <span></span>
+            <label>Username or Email</label>
+          </div>
+
+          <div class="txt_field">
+            <input type="password" required name="password" id="password" placeholder=" ">
+            <span></span>
+            <label>Password</label>
+            <div class="password-strength">
+              <div class="strength-bar" id="password-strength-bar"></div>
+            </div>
+          </div>    
+        </div>
+
+        <input type="submit" value="Login">
+        <div class="signup_link">
+          Not a member? <a href="{% url 'register' %}">Signup</a>
+          <p>Forgot your Password? <a href="">Reset Password</a></p> 
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Simple password strength indicator
+      document.getElementById('password').addEventListener('input', function(e) {
+        const password = e.target.value;
+        const strengthBar = document.getElementById('password-strength-bar');
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 1;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/\d/)) strength += 1;
+        if (password.match(/[^a-zA-Z\d]/)) strength += 1;
+        
+        strengthBar.className = 'strength-bar';
+        if (password.length > 0) {
+          if (strength <= 1) strengthBar.classList.add('strength-weak');
+          else if (strength <= 2) strengthBar.classList.add('strength-medium');
+          else strengthBar.classList.add('strength-strong');
+        }
+      });
+
+      // Ensure labels stay up when input has content (for browser autofill)
+      document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.txt_field input');
+        inputs.forEach(input => {
+          if (input.value) {
+            input.classList.add('has-value');
+          }
+          
+          input.addEventListener('input', function() {
+            if (this.value) {
+              this.classList.add('has-value');
+            } else {
+              this.classList.remove('has-value');
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
