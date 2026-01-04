@@ -25,17 +25,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Now use os.getenv to retrieve the values
-#SECRET_KEY = os.getenv("SECRET_KEY")
-#DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = False
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5o7!#*+zdh$h(4^nuz7mbl1r7#)*aazddcyi9@q!y529vwkj%f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['momshop-7.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -60,9 +58,9 @@ load_dotenv()
 
 # Cloudinary Settings
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dilvpkcoz',
-    'API_KEY': '368467712136952',
-    'API_SECRET': 'hUWhcMGx-KWjnywBjAF0ypYqqA0',
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
 # Tell Django to use Cloudinary for Media (Product Images)
@@ -195,8 +193,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 import cloudinary
 
 cloudinary.config( 
-  cloud_name = 'dilvpkcoz', 
-  api_key = '368467712136952', 
-  api_secret = 'hUWhcMGx-KWjnywBjAF0ypYqqA0',
+  cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'), 
+  api_key = os.getenv('CLOUDINARY_API_KEY'), 
+  api_secret = os.getenv('CLOUDINARY_API_SECRET'),
   secure = True
 )
