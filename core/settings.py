@@ -106,11 +106,21 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Use the environment variable if it exists, otherwise use your cluster string
+DATABASE_URL = os.environ.get(
+    'DATABASE_URL', 
+    'mysql://mzcSGh9QiCm3dgy.root:0yeaS7HIudfvLJWN@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/test'
+)
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-    )
+    'default': dj_database_url.parse(DATABASE_URL)
+}
+
+# TiDB Cloud Serverless REQUIREMENT: SSL must be enabled
+DATABASES['default']['OPTIONS'] = {
+    'ssl': {
+        'ca': '/etc/ssl/certs/ca-certificates.crt',
+    },
 }
 
 
