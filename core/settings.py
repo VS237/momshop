@@ -106,14 +106,35 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # Use the environment variable if it exists, otherwise use your cluster string
-DATABASE_URL = os.environ.get(
+'''DATABASE_URL = os.environ.get(
     'DATABASE_URL', 
     'mysql://mzcSGh9QiCm3dgy.root:0yeaS7HIudfvLJWN@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/test'
-)
+)'''
+# Use your TiDB connection string
+# NOTE: We use the password '0yeaS7HIudfvLJWN' provided in your latest credentials
+DATABASE_URL = "mysql://mzcSGh9QiCm3dgy.root:0yeaS7HIudfvLJWN@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/test"
 
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL)
 }
+
+# TiDB Cloud REQUIRES SSL. 
+# We use a conditional path so it works on both your local PC and Render.
+if os.environ.get('RENDER'):
+    # Path for Render servers
+    ca_path = '/etc/ssl/certs/ca-certificates.crt'
+else:
+    # For local Windows/Mac, most MySQL clients can find the CA automatically,
+    # or you can download the TiDB CA file and point to it here.
+    # If it fails locally, comment out the 'ca' line below temporarily.
+    ca_path = '/etc/ssl/certs/ca-certificates.crt' 
+
+DATABASES['default']['OPTIONS'] = {
+    'ssl': {'ca': ca_path}
+}
+'''DATABASES = {
+    'default': dj_database_url.parse(DATABASE_URL)
+}'''
 
 # TiDB Cloud Serverless REQUIREMENT: SSL must be enabled
 DATABASES['default']['OPTIONS'] = {
