@@ -1346,7 +1346,7 @@ def seller_dashboard_order(request):
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("DEEPSEEK_API_KEY"),
-    #api_key="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", # Ensure this is your actual key Gemini
+    
 )
 
 load_dotenv()
