@@ -55,7 +55,7 @@ class Seller(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
     address = models.TextField()
-    id_card_number = models.CharField(max_length=50, unique=True, default=0)
+    id_card_number = models.CharField(max_length=50, null=True, blank=True)
     salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     hire_date = models.DateField()
     is_active = models.BooleanField(default=True)
