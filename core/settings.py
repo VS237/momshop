@@ -33,7 +33,7 @@ DEBUG = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-ALLOWED_HOSTS = ['momshop-7.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['momshop.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
