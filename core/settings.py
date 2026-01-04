@@ -60,9 +60,9 @@ load_dotenv()
 
 # Cloudinary Settings
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'CLOUD_NAME': 'dilvpkcoz',
+    'API_KEY': '368467712136952',
+    'API_SECRET': 'hUWhcMGx-KWjnywBjAF0ypYqqA0',
 }
 
 # Tell Django to use Cloudinary for Media (Product Images)
@@ -195,8 +195,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 import cloudinary
 
 cloudinary.config( 
-  cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'), 
-  api_key = os.getenv('CLOUDINARY_API_KEY'), 
-  api_secret = os.getenv('CLOUDINARY_API_SECRET'),
+  cloud_name = 'dilvpkcoz', 
+  api_key = '368467712136952', 
+  api_secret = 'hUWhcMGx-KWjnywBjAF0ypYqqA0',
   secure = True
 )
