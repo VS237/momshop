@@ -75,11 +75,11 @@
                         <tbody>
                             <tr class="total-data">
                                 <td><strong>Subtotal: </strong></td>
-                                <td>{{ grand_total }} XAF</td>
+                                <td>{{ subtotal }} XAF</td>
                             </tr>
                             <tr class="total-data">
                                 <td><strong>Shipping: </strong></td>
-                                <td>Free</td>
+                                <td>{{ shipping_fee }} XAF</td>
                             </tr>
                             <tr class="total-data">
                                 <td><strong>Total: </strong></td>
@@ -91,7 +91,7 @@
                         <form action="{% url 'cart' %}" method="POST">
                             {% csrf_token %}
                             <p><input type="text" name="city" placeholder="City" required style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd;"></p>
-                            <p><input type="text" name="town" placeholder="Town/Neighborhood" required style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd;"></p>
+                            <p><input type="text" name="town" placeholder="Neighborhood" required style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd;"></p>
                             <p><input type="tel" name="phone" placeholder="Phone Number" required style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ddd;"></p>
                             <button type="submit" class="boxed-btn black w-100" style="border:none;">Place Order</button>
                         </form>

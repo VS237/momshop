@@ -163,36 +163,38 @@ def add_to_cart(request, product_id):
 def cart(request):
     cart_session = request.session.get('cart', {})
     cart_items = []
-    grand_total = Decimal('0.00')
+    subtotal = Decimal('0.00')
+    shipping_fee = Decimal('1000.00') # Defined shipping fee
 
     # 1. Prepare display data for the template
     for p_id, qty in cart_session.items():
         product = get_object_or_404(Product, id=p_id)
         total_price = Decimal(str(product.selling_price)) * int(qty)
-        grand_total += total_price
+        subtotal += total_price
         cart_items.append({
             'product': product,
             'quantity': qty,
             'total_price': total_price,
         })
 
+    # Calculate final total including shipping
+    grand_total = subtotal + shipping_fee
+
     # 2. Handle Order Placement (POST)
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.error(request, "Please log in to place an order.")
-            return redirect('login') # Replace with your login URL name
+            return redirect('login')
 
         if cart_items:
-            # Identify specific logged-in customer
             customer = get_object_or_404(Customer, user=request.user)
             transaction_id = str(uuid.uuid4())[:8].upper()
 
-            # Create ONE Parent Order
-            # Field names must match your NEW Order model
+            # Create ONE Parent Order with the shipping included in total_amount
             order = Order.objects.create(
                 order_number=transaction_id,
                 customer=customer,
-                total_amount=grand_total,
+                total_amount=grand_total, # This now includes the 1000 XAF
                 city=request.POST.get('city'),
                 town=request.POST.get('town'),
                 phone_number=request.POST.get('phone')
@@ -207,11 +209,9 @@ def cart(request):
                     price_at_purchase=item['product'].selling_price
                 )
 
-            # Clear cart session
             request.session['cart'] = {}
             request.session.modified = True
             
-            # Use redirect after POST to avoid "Confirm Form Resubmission" on refresh
             return redirect('order_success', order_number=transaction_id) 
         
         else:
@@ -221,10 +221,10 @@ def cart(request):
     # 3. Handle Page Display (GET)
     return render(request, 'cart.html', {
         'cart_items': cart_items,
-        'grand_total': grand_total
+        'subtotal': subtotal,        # Pass subtotal separately
+        'shipping_fee': shipping_fee, # Pass shipping fee
+        'grand_total': grand_total    # Pass the final sum
     })
-
-from django.shortcuts import redirect
 
 def remove_from_cart(request, product_id):
     cart = request.session.get('cart', {})
@@ -236,8 +236,6 @@ def remove_from_cart(request, product_id):
         request.session.modified = True
     
     return redirect('cart')
-
-from django.http import JsonResponse
 
 def update_cart(request, product_id):
     if request.method == 'POST':
@@ -258,8 +256,6 @@ def update_cart(request, product_id):
         new_count = sum(cart.values())
         
         return redirect('cart')
-    
-from django.http import JsonResponse
 
 def get_cart_count(request):
     cart = request.session.get('cart', {})
@@ -1037,9 +1033,6 @@ def admin_process_order(request, order_id):
     messages.success(request, f"Order #{order.order_number} processed and Sales recorded.")
     return redirect('admin_receipt', order_number=order.order_number)
 
-from django.shortcuts import render, get_object_or_404
-from .models import Order
-
 @user_passes_test(is_admin, login_url='login')
 def admin_receipt(request, order_number):
     """
@@ -1057,10 +1050,6 @@ def admin_receipt(request, order_number):
     return render(request, 'admin/admin_receipt.html', {
         'order': order,
     })
-
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib import messages
-from .models import Order
 
 @user_passes_test(is_admin, login_url='login')
 def clear_orders(request):
@@ -1206,16 +1195,28 @@ def sales_report_list(request):
     return render(request, 'seller/sales_report_list.html', context)
 
 def print_sales_report(request, report_id):
-    try:
-        seller = request.user.seller
-    except Seller.DoesNotExist:
-        logout(request)
-        messages.error(request, "Seller profile not found.")
-        return redirect('login')
-    """
-    View to render a printer-friendly version of a specific sales report.
-    """
+    # 1. Check if user is an admin
+    is_admin = request.user.is_superuser
+    seller = None
+
+    if not is_admin:
+        # 2. If not admin, try to get the seller profile
+        try:
+            seller = request.user.seller
+        except AttributeError: # Handles cases where user might not have the related attribute
+            logout(request)
+            messages.error(request, "Access denied. Seller profile not found.")
+            return redirect('login')
+
+    # 3. Fetch the report
     report = get_object_or_404(SalesReport, id=report_id)
+
+    # 4. Optional: Permission Check
+    # Ensure a non-admin seller can only see their own report
+    if not is_admin and report.seller != seller:
+        messages.error(request, "You do not have permission to view this report.")
+        return redirect('dashboard')
+
     return render(request, 'seller/print_report.html', {'report': report})
 
 def seller_dashboard_order(request):
@@ -1403,3 +1404,7 @@ def chatbot_response(request):
             return JsonResponse({"reply": f"Backend Error: {str(e)}"}, status=200)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)    
