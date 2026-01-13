@@ -26,7 +26,7 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Now use os.getenv to retrieve the values
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = False
+DEBUG = True if os.getenv("DEBUG", "False") == "True" else False
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
